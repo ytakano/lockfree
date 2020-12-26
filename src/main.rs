@@ -2,7 +2,8 @@ use std::ptr::null_mut;
 use std::sync::atomic::{AtomicPtr, Ordering};
 use std::sync::Arc;
 
-const NUM_LOOP: usize = 10000;
+const NUM_LOOP: usize = 1000000;
+const NUM_THREADS: usize = 4;
 
 struct Node<T> {
     next: AtomicPtr<Node<T>>,
@@ -78,13 +79,20 @@ fn main() {
     let stack = Arc::new(Stack::<usize>::new());
     let mut v = Vec::new();
 
-    for i in 0..8 {
+    for i in 0..NUM_THREADS {
         let stack0 = stack.clone();
         let t = std::thread::spawn(move || {
-            for j in 0..NUM_LOOP {
-                (*stack0).push(i * NUM_LOOP + j);
-                if let Some(k) = (*stack0).pop() {
-                    println!("pop: {}", k);
+            if i & 1 == 0 {
+                for j in 0..NUM_LOOP {
+                    let k = i * NUM_LOOP + j;
+                    (*stack0).push(k);
+                    println!("push: {}", k);
+                }
+            } else {
+                for _ in 0..NUM_LOOP {
+                    if let Some(k) = (*stack0).pop() {
+                        println!("pop: {}", k);
+                    }
                 }
             }
         });
