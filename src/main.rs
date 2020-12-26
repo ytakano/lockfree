@@ -88,12 +88,17 @@ fn main() {
                     (*stack0).push(k);
                     println!("push: {}", k);
                 }
+                println!("finished push: #{}", i);
             } else {
                 for _ in 0..NUM_LOOP {
-                    if let Some(k) = (*stack0).pop() {
-                        println!("pop: {}", k);
+                    loop {
+                        if let Some(k) = (*stack0).pop() {
+                            println!("pop: {}", k);
+                            break;
+                        }
                     }
                 }
+                println!("finished pop: #{}", i);
             }
         });
         v.push(t);
