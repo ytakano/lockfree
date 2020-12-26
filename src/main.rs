@@ -82,7 +82,7 @@ fn main() {
         let stack0 = stack.clone();
         let t = std::thread::spawn(move || {
             for j in 0..NUM_LOOP {
-                (*stack0).push(i * j);
+                (*stack0).push(i * NUM_LOOP + j);
                 if let Some(k) = (*stack0).pop() {
                     println!("pop: {}", k);
                 }
