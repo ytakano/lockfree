@@ -12,7 +12,7 @@ pub struct StackHead<T> {
 }
 
 impl<T> StackHead<T> {
-    pub fn new() -> StackHead<T> {
+    fn new() -> StackHead<T> {
         StackHead { head: null_mut() }
     }
 

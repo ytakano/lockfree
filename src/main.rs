@@ -42,4 +42,6 @@ fn main() {
     for t in v {
         t.join().unwrap();
     }
+
+    assert!(stack.get_mut().pop() == None);
 }
