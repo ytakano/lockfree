@@ -1,4 +1,3 @@
-use super::lockfree::LockFreeData;
 use std::ptr::null_mut;
 
 #[repr(C)]
@@ -8,13 +7,13 @@ struct Node<T> {
 }
 
 #[repr(C)]
-pub struct Stack<T> {
+pub struct StackHead<T> {
     head: *mut Node<T>,
 }
 
-impl<T> Stack<T> {
-    pub fn new() -> Stack<T> {
-        Stack { head: null_mut() }
+impl<T> StackHead<T> {
+    pub fn new() -> StackHead<T> {
+        StackHead { head: null_mut() }
     }
 
     pub fn push(&mut self, v: T) {
@@ -74,7 +73,7 @@ impl<T> Stack<T> {
     }
 }
 
-impl<T> Drop for Stack<T> {
+impl<T> Drop for StackHead<T> {
     fn drop(&mut self) {
         let mut node = self.head;
         while node != null_mut() {
@@ -84,4 +83,25 @@ impl<T> Drop for Stack<T> {
     }
 }
 
-impl<T> LockFreeData for Stack<T> {}
+//-----------------------------------------------------------------------------
+
+use std::cell::UnsafeCell;
+
+pub struct Stack<T> {
+    data: UnsafeCell<StackHead<T>>,
+}
+
+impl<T> Stack<T> {
+    pub fn new() -> Stack<T> {
+        Stack {
+            data: UnsafeCell::new(StackHead::new()),
+        }
+    }
+
+    pub fn get_mut(&self) -> &mut StackHead<T> {
+        unsafe { &mut *self.data.get() }
+    }
+}
+
+unsafe impl<T> Sync for Stack<T> {}
+unsafe impl<T> Send for Stack<T> {}
